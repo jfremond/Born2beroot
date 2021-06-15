@@ -15,9 +15,9 @@
 # email to the user the crontab file belong to (unless redirected).
 #
 # Run a shell script at every 10th minute
-*/10 * * * * bash /usr/local/sbin/monitoring.sh
-# Run a shell script every 30 seconds
-# * * * * * (sleep 30 ; bash /usr/local/sbin/monitoring.sh)
+*/10 * * * * sh /usr/local/sbin/monitoring.sh
+# Run a shell script with a 30 second delay
+# * * * * * (sleep 30 ; sh /usr/local/sbin/monitoring.sh)
 #
 # For more information see the manual page of crontab(5) and cron (8)
 #

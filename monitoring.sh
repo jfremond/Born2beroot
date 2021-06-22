@@ -10,11 +10,13 @@ VIRTUAL_CPU=$(grep -c "cpu cores" /proc/cpuinfo)
 MEM_USED=$(free --mega | grep Mem | awk '{print $3}')
 TOTAL_MEM=$(free --mega | grep Mem | awk '{print $2}')
 PERCENT_MEM=$(free --mega | grep Mem | awk '{print ($3/$2) * 100}')
-TOTAL_DISK=$(df | awk '{print $2}' | grep [0-9] | paste -sd+ - | bc)
-DISK_USED=$(df | awk '{print $3}' | grep [0-9] | paste -sd+ - | bc)
-PERCENT_DISK=$(df | awk '{print ($3/$2) * 100}' | grep [0-9] | paste -sd+ - | bc)
-BOOT=$(who -b)
-USER_LIST=$(cut -d: -f1 /etc/passwd)
+TOTAL_DISK=$(df -H| awk '{print $2}' | grep [0-9] | paste -sd+ | bc)
+DISK_USED=$(df -H | awk '{print $3}' | grep [0-9] | paste -sd+ | bc)
+PERCENT_DISK=$(df | awk '{print ($3/$2) * 100}' | paste -sd+ | bc)
+CPU_LOAD=$(head -1 /proc/stat | awk '{print ($2 + $4) / ($2 + $4 + $5) * 100}')
+BOOT_DAY=$(who -b | awk '{print $3}')
+BOOT_HOUR=$(who -b | awk '{print $4}')
+SUDO_COUNT=$(grep "COMMAND" /var/log/sudo/testlog | wc -l)
 
 # Function that prints what I need to print
 function_to_print()
@@ -24,8 +26,9 @@ function_to_print()
 	echo "\t#vCPU : $VIRTUAL_CPU"
 	echo "\t#Memory Usage : "$MEM_USED/$TOTAL_MEM"MB ($PERCENT_MEM%)"
 	echo "\t#Disk usage : "$DISK_USED/$TOTAL_DISK" ($PERCENT_DISK%)"
-	echo "\t#Last boot : $BOOT"
-	echo "\t#Number users : $(USER_LIST)" #WRONG
+	echo "\t#CPU load : $CPU_LOAD%"
+	echo "\t#Last boot : $BOOT_DAY $BOOT_HOUR"
+	echo "\t#Sudo : $SUDO_COUNT cmd"
 }
 
 #Calling the function

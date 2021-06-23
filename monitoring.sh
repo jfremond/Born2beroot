@@ -10,12 +10,15 @@ VIRTUAL_CPU=$(grep -c "cpu cores" /proc/cpuinfo)
 MEM_USED=$(free --mega | grep Mem | awk '{print $3}')
 TOTAL_MEM=$(free --mega | grep Mem | awk '{print $2}')
 PERCENT_MEM=$(free --mega | grep Mem | awk '{print ($3/$2) * 100}')
-TOTAL_DISK=$(df -H| awk '{print $2}' | grep [0-9] | paste -sd+ | bc)
+TOTAL_DISK=$(df -h | awk '{print $2}' | grep [0-9] | paste -sd+ | bc)
 DISK_USED=$(df -H | awk '{print $3}' | grep [0-9] | paste -sd+ | bc)
-PERCENT_DISK=$(df | awk '{print ($3/$2) * 100}' | paste -sd+ | bc)
+PERCENT_DISK=$(df -H | grep [0-9] | awk '{print ($3/$2)}' | paste -sd+ | bc)
 CPU_LOAD=$(head -1 /proc/stat | awk '{print ($2 + $4) / ($2 + $4 + $5) * 100}')
 BOOT_DAY=$(who -b | awk '{print $3}')
 BOOT_HOUR=$(who -b | awk '{print $4}')
+IP_ADDR=$(hostname -I)
+MAC_ADDR=$(cat /sys/class/net/enp0s3/address)
+TCP_CONN=$(netstat -a | grep "ESTABLISHED" | wc -l)
 SUDO_COUNT=$(grep "COMMAND" /var/log/sudo/testlog | wc -l)
 
 # Function that prints what I need to print
@@ -28,6 +31,8 @@ function_to_print()
 	echo "\t#Disk usage : "$DISK_USED/$TOTAL_DISK" ($PERCENT_DISK%)"
 	echo "\t#CPU load : $CPU_LOAD%"
 	echo "\t#Last boot : $BOOT_DAY $BOOT_HOUR"
+	echo "\t#Network : IP $IP_ADDR($MAC_ADDR)"
+	echo "\t#Connexions TCP : $TCP_CONN ESTABLISHED"
 	echo "\t#Sudo : $SUDO_COUNT cmd"
 }
 

@@ -4,6 +4,13 @@
 export LANG=C.UTF-8
 
 # Getting variables
+if sudo lvm pvdisplay | grep -q "Physical volume";
+then
+	LVM_USE="yes"
+else
+	LVM_USE="no"
+fi
+
 ARCHITECTURE=$(uname -a)
 PHYSICAL_CPU=$(grep "physical id" /proc/cpuinfo | sort -u | wc -l)
 VIRTUAL_CPU=$(grep -c "cpu cores" /proc/cpuinfo)
@@ -16,9 +23,10 @@ PERCENT_DISK=$(df -H | grep [0-9] | awk '{print ($3/$2)}' | paste -sd+ | bc)
 CPU_LOAD=$(head -1 /proc/stat | awk '{print ($2 + $4) / ($2 + $4 + $5) * 100}')
 BOOT_DAY=$(who -b | awk '{print $3}')
 BOOT_HOUR=$(who -b | awk '{print $4}')
+TCP_CONN=$(netstat -a | grep "ESTABLISHED" | wc -l)
 IP_ADDR=$(hostname -I)
 MAC_ADDR=$(cat /sys/class/net/enp0s3/address)
-TCP_CONN=$(netstat -a | grep "ESTABLISHED" | wc -l)
+USERS_COUNT=$(users | wc -w)
 SUDO_COUNT=$(grep "COMMAND" /var/log/sudo/testlog | wc -l)
 
 # Function that prints what I need to print
@@ -31,8 +39,10 @@ function_to_print()
 	echo "\t#Disk usage : "$DISK_USED/$TOTAL_DISK" ($PERCENT_DISK%)"
 	echo "\t#CPU load : $CPU_LOAD%"
 	echo "\t#Last boot : $BOOT_DAY $BOOT_HOUR"
-	echo "\t#Network : IP $IP_ADDR($MAC_ADDR)"
+	echo "\t#LVM use : $LVM_USE"
 	echo "\t#Connexions TCP : $TCP_CONN ESTABLISHED"
+	echo "\t#User log : $USERS_COUNT"
+	echo "\t#Network : IP $IP_ADDR($MAC_ADDR)"
 	echo "\t#Sudo : $SUDO_COUNT cmd"
 }
 

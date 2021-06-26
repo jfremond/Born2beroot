@@ -4,7 +4,7 @@
 export LANG=C.UTF-8
 
 # Getting variables
-if sudo lvm pvdisplay | grep -q "Physical volume";
+if [ "$(lsblk | grep lvm | wc -l)" -gt 0 ]
 then
 	LVM_USE="yes"
 else
